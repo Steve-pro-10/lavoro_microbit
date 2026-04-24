@@ -1,1 +1,39 @@
+is_client = False
+is_server = False
+is_configured = False
+votato = False
+
+
+radio.on()
+basic.show_string("?")
+def vota():
+        
+    radio.set_group(36)
+    if not votato:
+        if input.button_is_pressed(Button.A):
+            radio.send_number(1)#si
+            basic.show_icon(IconNames.YES)
+            votato = True
+        elif input.button_is_pressed(Button.B):
+            radio.send_string("NO")
+            basic.show_icon(IconNames.NO)
+            votato = True
+        
+
+def server():
+
+
+basic.show_string("choose")
+def on_button_pressed_a():
+    if not is_configured:
+        is_client = False
+        is_configured = True
+input.on_button_pressed(Button.A, on_button_pressed_a)
+
+def on_button_pressed_b():
+    if not is_configured:
+        is_server = True
+        is_configured = True
+input.on_button_pressed(Button.B, on_button_pressed_b)
+
 
