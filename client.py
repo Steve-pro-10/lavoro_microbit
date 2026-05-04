@@ -1,72 +1,53 @@
-# inserire in binario il quorum
-is_client = False
-is_server = False
-quorum_conf_is_finished = False
-is_configured = False
-binario = ""
-can_vote = False
-votato = False
-quorum = 0
+# Imports go at the top
+from microbit import *
+import radio
 radio.on()
-basic.show_string("?")
-radio.set_group(36)
-basic.show_string("choose")
+radio.config(group=36)
+class Server():
+    def __init__(self):
+        self.quorum_conf_is_finished = False
+        self.is_configured = False
+        self.binario = ""
+        self.quorum = 0
 
+    def on_button_pressed_a(self):
 
-def server():
-    pass
-def vota():
-    
-    def on_received_number(receivedNumber):
-        if not can_vote2 and receivedNumber == 1:
-            # permette di iniziare a votare
-            can_vote2 = True
-    radio.on_received_number(on_received_number)
-    
-    if not (votato2):
-        if input.button_is_pressed(Button.A):
-            radio.send_number(1)# si
-            basic.show_icon(IconNames.YES)
-            votato2 = True
-        elif input.button_is_pressed(Button.B):
-            radio.send_number(0)# no
-            basic.show_icon(IconNames.NO)
-            votato2 = True
+        if self.is_configured and not self.quorum_conf_is_finished:
+            # se è gia stato scelto il ruolo del bot adesso si passa alla conf. del quoru
+            self.binario = "" + self.binario + "1"
+            print(self.binario)
+        elif self.is_configured and self.quorum_conf_is_finished and is_server:
+            # se è gia stato conf. tutto fa partire il permess
+            # parte la votazione
+            radio.send("1")
+    def on_button_pressed_b(self):
 
-def on_button_pressed_a():
-    global is_client, is_configured, binario
-    if not is_configured:
-        # se non è ancora stato scelto server o client lo sceglie
-        is_client = True
-        is_configured = True
-    elif is_configured and not quorum_conf_is_finished:
-        # se è gia stato scelto il ruolo del bot adesso si passa alla conf. del quoru
-        binario = "" + binario + "1"
-        print(binario)
-    elif is_configured and quorum_conf_is_finished and is_server:
-        # se è gia stato conf. tutto fa partire il permess
-        # parte la votazione
-        radio.send_number(1)
+        if self.is_configured and not self.quorum_conf_is_finished:
+            self.binario = "" + self.binario + "0"
+            print(self.binario)
+    def on_button_pressed_ab(self):
+
+        if not self.quorum_conf_is_finished:
+            self.quorum_conf_is_finished = True
+            self.binario = self.binario[::-1]
+            decimale = int(self.binario, 2)
+            self.quorum = decimale
+            print(self.quorum)
+class Client():
+    def __init__(self):
+        self.has_voted = False
+    def vote(self):
+        
+        
+        
+
 input.on_button_pressed(Button.A, on_button_pressed_a)
 
-def on_button_pressed_ab():
-    global quorum_conf_is_finished, binario, quorum
-    if not quorum_conf_is_finished:
-        quorum_conf_is_finished = True
-        binario = _py.string_slice(binario, None, None, -1)
-        decimale = int(binario, 2)
-        quorum = decimale
-        print(quorum)
+
 input.on_button_pressed(Button.AB, on_button_pressed_ab)
 
-def on_button_pressed_b():
-    global is_server, is_configured, binario
-    if not is_configured:
-        is_server = True
-        is_configured = True
-    elif is_configured and not quorum_conf_is_finished:
-        binario = "" + binario + "0"
-        print(binario)
+
 input.on_button_pressed(Button.B, on_button_pressed_b)
+
 
 
