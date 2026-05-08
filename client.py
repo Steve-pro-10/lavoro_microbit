@@ -3,7 +3,7 @@ from microbit import *
 import radio, music
 
 radio.on()
-radio.config(group=36)
+radio.config(group=36,power=7)
 
 class Server():  #classe server
     def __init__(self):
@@ -35,6 +35,7 @@ class Server():  #classe server
             decimale = int(self.binario, 2)
             self.quorum = decimale
             self.quorum_conf_is_finished = True
+            display.show(f"quorum: {self.quorum}")
             print(self.quorum)
     def config_quorum(self):
         #per configurare il quorum bisogna inserirlo in binario
@@ -49,7 +50,15 @@ class Server():  #classe server
                 self.on_button_pressed_b()
         
             sleep(50)  # piccola pausa per evitare busy loop
-            
+    def end(self):
+        if self.voti_tot >= self.quorum:
+            display.show("voto valido")
+            if self.voti_si > self.voti_no:
+                display.show("SI HA VINTO")
+            elif self.voti_si == self.voti_no:
+                display.show("pareggio, voto non valido")
+            else:
+                display.show("NO HA VINTO!")
     def recive_vote(self):
         if self.quorum_conf_is_finished:
             
@@ -73,6 +82,8 @@ class Server():  #classe server
                     self.voti_tot += 1
                 if button_b.is_pressed() and button_a.is_pressed():
                     self.is_recieving_votes = False
+                    
+
                    
                 sleep(100)#così controlla ogni 100milliscecondi, 10 volte al secondo
 
@@ -83,7 +94,7 @@ class Server():  #classe server
 
 class Client():
     def __init__(self):
-        self.has_voted = False
+        self.can_vote = False
         self.has_perm_to_vote = False
         
     def wait_for_perm_to_vote(self):
@@ -92,19 +103,22 @@ class Client():
             if message == '1':
                 self.has_perm_to_vote = True
     def vote_yes(self):
-        if not self.has_voted and self.has_perm_to_vote:
+        if self.has_perm_to_vote:
             radio.send("s")# si
-            self.has_voted = True
+
     def vote_no(self):
-        if not self.has_voted and self.has_perm_to_vote:
+        if self.has_perm_to_vote:
             radio.send("n")# no
-            self.has_voted = True
+
     def vote(self):
-        while not self.has_voted: 
-            if button_a.was_pressed():
+        while self.can_vote: 
+            if button_a.is_pressed() and button_b.is_pressed():
+                self.can_vote = False
+            elif button_a.was_pressed():
                 self.vote_yes()
             elif button_b.was_pressed():
                 self.vote_no()
+            music.play(music.BA_DING)
     def run(self):
         self.wait_for_perm_to_vote()
         self.vote()
@@ -139,5 +153,6 @@ class Main():
             self.microbit.run()
             radio.off()
 app = Main()
+app.run()
 app.run()
 
