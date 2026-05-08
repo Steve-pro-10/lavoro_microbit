@@ -5,7 +5,7 @@ import radio, music
 radio.on()
 radio.config(group=36)
 
-class Server():
+class Server():  #classe server
     def __init__(self):
         self.quorum_conf_is_finished = False
         self.is_recieving_votes = False
@@ -14,7 +14,7 @@ class Server():
         self.voti_tot = 0
         self.binario = ""
         self.quorum = 0
-
+        #variabili
     def on_button_pressed_a(self):
 
         if not self.quorum_conf_is_finished:
@@ -37,6 +37,8 @@ class Server():
             self.quorum_conf_is_finished = True
             print(self.quorum)
     def config_quorum(self):
+        #per configurare il quorum bisogna inserirlo in binario
+        #tramite i pulsanti A e B 
         display.show("configura quorum")
         while not self.quorum_conf_is_finished:
             if button_a.is_pressed() and button_b.is_pressed():
@@ -92,15 +94,17 @@ class Client():
     def vote_yes(self):
         if not self.has_voted and self.has_perm_to_vote:
             radio.send("s")# si
-
+            self.has_voted = True
     def vote_no(self):
         if not self.has_voted and self.has_perm_to_vote:
             radio.send("n")# no
+            self.has_voted = True
     def vote(self):
-        if button_a.was_pressed():
-            self.vote_yes()
-        elif button_b.was_pressed():
-            self.vote_no()
+        while not self.has_voted: 
+            if button_a.was_pressed():
+                self.vote_yes()
+            elif button_b.was_pressed():
+                self.vote_no()
     def run(self):
         self.wait_for_perm_to_vote()
         self.vote()
@@ -131,8 +135,9 @@ class Main():
         display.show("scegli")
         self.config()
         
-        while 1:
+        while True:
             self.microbit.run()
+            radio.off()
 app = Main()
 app.run()
-radio.off()
+
