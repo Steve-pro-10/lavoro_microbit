@@ -35,7 +35,7 @@ class Server():  #classe server
             decimale = int(self.binario, 2)
             self.quorum = decimale
             self.quorum_conf_is_finished = True
-            display.show(f"quorum: {self.quorum}")
+
             print(self.quorum)
     def config_quorum(self):
         #per configurare il quorum bisogna inserirlo in binario
@@ -90,24 +90,26 @@ class Server():  #classe server
     def run(self):
         self.config_quorum()
         self.recive_vote()
+         self.end()
 
 
 class Client():
     def __init__(self):
         self.can_vote = False
-        self.has_perm_to_vote = False
+
         
     def wait_for_perm_to_vote(self):
-        while not self.has_perm_to_vote:
+        while not self.can_vote:
             message = radio.receive()
             if message == '1':
-                self.has_perm_to_vote = True
+
+                self.can_vote = True
     def vote_yes(self):
-        if self.has_perm_to_vote:
+        if self.can_vote:
             radio.send("s")# si
 
     def vote_no(self):
-        if self.has_perm_to_vote:
+        if self.can_vote:
             radio.send("n")# no
 
     def vote(self):
@@ -116,9 +118,11 @@ class Client():
                 self.can_vote = False
             elif button_a.was_pressed():
                 self.vote_yes()
+                music.play(music.BA_DING)
             elif button_b.was_pressed():
                 self.vote_no()
-            music.play(music.BA_DING)
+                music.play(music.BA_DING)
+           
     def run(self):
         self.wait_for_perm_to_vote()
         self.vote()
@@ -149,10 +153,8 @@ class Main():
         display.show("scegli")
         self.config()
         
-        while True:
-            self.microbit.run()
-            radio.off()
+
+        self.microbit.run()
+        radio.off()
 app = Main()
 app.run()
-app.run()
-
