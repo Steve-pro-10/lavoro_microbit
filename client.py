@@ -66,9 +66,9 @@ class Server():  #classe server
         # parte la votazione
             display.show("premi A per iniziare")
             while not self.is_recieving_votes:
-                if button_a.was_pressed():
+                if button_a.is_pressed():
                     self.is_recieving_votes = True
-            radio.send("1")
+            radio.send('1')
             display.show("voto iniziato")
 
             while self.is_recieving_votes:
@@ -90,7 +90,7 @@ class Server():  #classe server
     def run(self):
         self.config_quorum()
         self.recive_vote()
-         self.end()
+        self.end()
 
 
 class Client():
