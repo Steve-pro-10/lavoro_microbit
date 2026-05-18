@@ -1,4 +1,4 @@
-# Imports go at the top
+Imports go at the top
 from microbit import *
 import radio, music
 
@@ -50,15 +50,7 @@ class Server():  #classe server
                 self.on_button_pressed_b()
         
             sleep(50)  # piccola pausa per evitare busy loop
-    def end(self):
-        if self.voti_tot >= self.quorum:
-            display.show("voto valido")
-            if self.voti_si > self.voti_no:
-                display.show("SI HA VINTO")
-            elif self.voti_si == self.voti_no:
-                display.show("pareggio, voto non valido")
-            else:
-                display.show("NO HA VINTO!")
+
     def recive_vote(self):
         if self.quorum_conf_is_finished:
             
@@ -86,6 +78,17 @@ class Server():  #classe server
 
                    
                 sleep(100)#così controlla ogni 100milliscecondi, 10 volte al secondo
+    def end(self):
+        if self.voti_tot >= self.quorum:
+            display.show("voto valido")
+            if self.voti_si > self.voti_no:
+                display.show("SI HA VINTO")
+            elif self.voti_si == self.voti_no:
+                display.show("pareggio, voto non valido")
+            else:
+                display.show("NO HA VINTO!")
+        else:
+            display.show("voto non valido")
 
     def run(self):
         self.config_quorum()
