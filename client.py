@@ -155,8 +155,6 @@ class Main():
     def run(self):
         display.show("scegli")
         self.config()
-        
-
         self.microbit.run()
         radio.off()
 app = Main()
